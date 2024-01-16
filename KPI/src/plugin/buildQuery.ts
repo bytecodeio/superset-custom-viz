@@ -238,7 +238,10 @@ export default function buildQuery(formData: QueryFormData) {
   console.log(testSince, testUntil);
 
   let queryBComparator: any;
-  console.log('Print Time', timeComparison)
+  let queryBFilter : {};
+  let queryBFilters :{};
+  let formDataB: {};
+
   if (timeComparison!='c'){
 
   const [prevStartDateMoment, prevEndDateMoment] = calculatePrev(
@@ -251,34 +254,46 @@ export default function buildQuery(formData: QueryFormData) {
     'YYYY-MM-DDTHH:mm:ss',
   )} : ${prevEndDateMoment.format('YYYY-MM-DDTHH:mm:ss')}`;
 
+    // queryBFilter = {
+    //   col: timeFilter.subject,
+    //   op: 'TEMPORAL_RANGE',
+    //   val: queryBComparator.replace(/Z/g, ''),
+    // };
+
+    queryBFilter = {
+      ...timeFilter,
+      comparator: queryBComparator.replace(/Z/g, '')
+    }
+
+    const otherFilters = formData.adhoc_filters.filter((_value: any, index: number) => timeFilterIndex !== index);
+    queryBFilters = otherFilters ? [queryBFilter, ...otherFilters] : [queryBFilter];
+    
+    formDataB= {
+      ...formData,
+      adhoc_filters: queryBFilters,
+    }
+
+    console.log('FD',formData),
+
+    console.log('FDB',formDataB)
+
   } else {
-    const timeBFilter: any = formData.adhoc_custom.find(
-      ({ operator }: { operator: string }) => operator === 'TEMPORAL_RANGE',
-    );
 
-    const timeBFilterIndex: number = formData.adhoc_filters.findIndex(
-      ({ operator }: { operator: string }) => operator === 'TEMPORAL_RANGE',
-    );
-    
-    
+    formDataB= {
+      ...formData,
+      adhoc_filters: formData.adhoc_custom,
+    }
 
-    queryBComparator = timeBFilter.comparator;
-    console.log('Custom Range', queryBComparator);
   }
 
   console.log('Comparator', queryBComparator);
 
-  const queryBFilter = {
-    col: timeFilter.subject,
-    op: 'TEMPORAL_RANGE',
-    val: queryBComparator.replace(/Z/g, ''),
-  };
 
-  const queryContextB = buildQueryContext(formData, baseQueryObject => [
+
+  const queryContextB = buildQueryContext(formDataB, baseQueryObject => [
     {
       ...baseQueryObject,
       groupby,
-      filters: [queryBFilter],
     },
   ]);
 

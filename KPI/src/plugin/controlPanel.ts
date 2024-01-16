@@ -118,7 +118,6 @@ const config: ControlPanelConfig = {
   // For control input types, see: superset-frontend/src/explore/components/controls/index.js
 
   controlPanelSections: [
-    sections.legacyRegularTime,
     {
       label: t('Query'),
       expanded: true,
@@ -178,9 +177,9 @@ const config: ControlPanelConfig = {
           {
             name: `adhoc_custom`,
             config: {
-              label: 'FILTERS (only used with Custom Selection',
-              description: 'This is the value',
-            ...sharedControls.adhoc_filters
+              ...sharedControls.adhoc_filters,
+              label: t('FILTERS (Custom)'),
+              description: 'This only applies when selecting the Range for Comparison Type- Custom'
           },
           },
       ],
@@ -213,15 +212,15 @@ const config: ControlPanelConfig = {
                 },
                 {
                   label: t('Normal'),
-                  value: 26,
+                  value: 30,
                 },
                 {
                   label: t('Large'),
-                  value: 32,
+                  value: 48,
                 },
                 {
                   label: t('Huge'),
-                  value: 40,
+                  value: 60,
                 },
               ],
             },
@@ -268,7 +267,7 @@ const config: ControlPanelConfig = {
   controlOverrides: {
     y_axis_format: {
       label: t('Number format'),
-    },
+    }
   },
 };
 
