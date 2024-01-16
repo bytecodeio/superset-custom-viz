@@ -212,8 +212,6 @@ function calculatePrev(startDate: Moment | null, endDate: Moment | null, calcTyp
 export default function buildQuery(formData: QueryFormData) {
   const { cols: groupby, time_comparison: timeComparison } = formData;
 
-  console.log('formData Explain', formData);
-
   const queryContextA = buildQueryContext(formData, baseQueryObject => [
     {
       ...baseQueryObject,
@@ -221,7 +219,6 @@ export default function buildQuery(formData: QueryFormData) {
     },
   ]);
 
-  console.log('queryContextA', queryContextA.queries[0]);
 
   const timeFilter: any = formData.adhoc_filters.find(
     ({ operator }: { operator: string }) => operator === 'TEMPORAL_RANGE',
@@ -235,7 +232,6 @@ export default function buildQuery(formData: QueryFormData) {
     timeFilter.comparator.toLowerCase(),
   );
 
-  console.log(testSince, testUntil);
 
   let queryBComparator: any;
   let queryBFilter : {};
@@ -250,15 +246,9 @@ export default function buildQuery(formData: QueryFormData) {
     timeComparison,
   );
 
-    queryBComparator = `${prevStartDateMoment.format(
+    queryBComparator = `${prevStartDateMoment?.format(
     'YYYY-MM-DDTHH:mm:ss',
-  )} : ${prevEndDateMoment.format('YYYY-MM-DDTHH:mm:ss')}`;
-
-    // queryBFilter = {
-    //   col: timeFilter.subject,
-    //   op: 'TEMPORAL_RANGE',
-    //   val: queryBComparator.replace(/Z/g, ''),
-    // };
+  )} : ${prevEndDateMoment?.format('YYYY-MM-DDTHH:mm:ss')}`;
 
     queryBFilter = {
       ...timeFilter,
@@ -273,10 +263,6 @@ export default function buildQuery(formData: QueryFormData) {
       adhoc_filters: queryBFilters,
     }
 
-    console.log('FD',formData),
-
-    console.log('FDB',formDataB)
-
   } else {
 
     formDataB= {
@@ -286,10 +272,6 @@ export default function buildQuery(formData: QueryFormData) {
 
   }
 
-  console.log('Comparator', queryBComparator);
-
-
-
   const queryContextB = buildQueryContext(formDataB, baseQueryObject => [
     {
       ...baseQueryObject,
@@ -297,7 +279,6 @@ export default function buildQuery(formData: QueryFormData) {
     },
   ]);
 
-  console.log('queryContexB Values', queryContextB);
 
   return {
     ...queryContextA,
