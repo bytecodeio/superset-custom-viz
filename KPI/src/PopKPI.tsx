@@ -74,9 +74,6 @@ const ComparisonValue = styled.div`
  *  * FormData (your controls!) provided as props by transformProps.ts
  */
 
-const getAdjustedFontSize = (props) => {
-  const calculateMaxFontSize( props.text)
-}
 
 
 export default function PopKPI(props: CustomVizProps) {
