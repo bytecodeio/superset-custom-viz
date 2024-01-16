@@ -69,6 +69,7 @@ export default function transformProps(chartProps: ChartProps) {
     metrics,
     yAxisFormat,
     currencyFormat,
+    subheaderFontSize,
   } = formData;
   const dataA = queriesData[0].data as TimeseriesDataRecord[];
   const dataB = queriesData[1].data as TimeseriesDataRecord[];
@@ -121,6 +122,7 @@ export default function transformProps(chartProps: ChartProps) {
     percentDifference,
     boldText,
     headerFontSize,
+    subheaderFontSize,
     headerText,
     compType,
   };

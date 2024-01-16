@@ -25,6 +25,21 @@ import {
   sections,
 } from '@superset-ui/chart-controls';
 
+const adhoc_filters: SharedControlConfig<'AdhocFilterControl'> = {
+  type: 'AdhocFilterControl',
+  label: t('Filters'),
+  default: null,
+  description: '',
+  mapStateToProps: ({ datasource, form_data }) => ({
+    columns: datasource?.columns.filter(c => c.filterable) || [],
+    savedMetrics: datasource?.metrics || [],
+    // current active adhoc metrics
+    selectedMetrics:
+      form_data.metrics || (form_data.metric ? [form_data.metric] : []),
+    datasource,
+  }),
+};
+
 const config: ControlPanelConfig = {
   /**
    * The control panel is split into two tabs: "Query" and
@@ -101,6 +116,7 @@ const config: ControlPanelConfig = {
    */
 
   // For control input types, see: superset-frontend/src/explore/components/controls/index.js
+
   controlPanelSections: [
     sections.legacyRegularTime,
     {
@@ -141,6 +157,7 @@ const config: ControlPanelConfig = {
                 ['w', 'Week'],
                 ['m', 'Month'],
                 ['r', 'Range'],
+                ['c', 'Custom'],
               ],
             },
           },
@@ -154,42 +171,97 @@ const config: ControlPanelConfig = {
       ],
     },
     {
+      label: t('Custom Time Range'),
+      expanded: true,
+      controlSetRows: [
+        [
+          {
+            name: `adhoc_custom`,
+            config: {
+              label: 'FILTERS (only used with Custom Selection',
+              description: 'This is the value',
+            ...sharedControls.adhoc_filters
+          },
+          },
+      ],
+      ]
+    },
+    {
       label: t('Chart Options'),
       expanded: true,
       controlSetRows: [
-        ['color_picker', null],
-        [sharedControls.headerFontSize],
-        [sharedControls.subheaderFontSize],
         ['y_axis_format'],
         ['currency_format'],
         [
           {
-            name: 'time_format',
+            name: 'header_font_size',
             config: {
               type: 'SelectControl',
-              freeForm: true,
-              label: t('Date format'),
+              label: t('Big Number Font Size'),
               renderTrigger: true,
-              choices: D3_TIME_FORMAT_OPTIONS,
-              description: D3_FORMAT_DOCS,
-              default: smartDateFormatter.id,
+              clearable: false,
+              default: 0.4,
+              // Values represent the percentage of space a header should take
+              options: [
+                {
+                  label: t('Tiny'),
+                  value: 16,
+                },
+                {
+                  label: t('Small'),
+                  value: 20,
+                },
+                {
+                  label: t('Normal'),
+                  value: 26,
+                },
+                {
+                  label: t('Large'),
+                  value: 32,
+                },
+                {
+                  label: t('Huge'),
+                  value: 40,
+                },
+              ],
             },
-          },
+          }
         ],
         [
           {
-            name: 'force_timestamp_formatting',
+            name: 'subheader_font_size',
             config: {
-              type: 'CheckboxControl',
-              label: t('Force date format'),
+              type: 'SelectControl',
+              label: t('Subheader Font Size'),
               renderTrigger: true,
-              default: false,
-              description: t(
-                'Use date formatting even when metric value is not a timestamp',
-              ),
+              clearable: false,
+              default: 0.15,
+              // Values represent the percentage of space a subheader should take
+              options: [
+                {
+                  label: t('Tiny'),
+                  value: 16,
+                },
+                {
+                  label: t('Small'),
+                  value: 20,
+                },
+                {
+                  label: t('Normal'),
+                  value: 26,
+                },
+                {
+                  label: t('Large'),
+                  value: 32,
+                },
+                {
+                  label: t('Huge'),
+                  value: 40,
+                },
+              ],
             },
-          },
-        ],
+          }
+        ]
       ],
     },
   ],

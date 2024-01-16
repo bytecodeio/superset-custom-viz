@@ -18,9 +18,6 @@
  */
 import { buildQueryContext, QueryFormData } from '@superset-ui/core';
 import moment, { Moment } from 'moment';
-import rison from 'rison';
-import { SupersetClient } from '@superset-ui/core';
-import { any } from 'prop-types';
 
 /**
  * The buildQuery function is used to create an instance of QueryContext that's
@@ -182,7 +179,12 @@ function getSinceUntil(
   return [_since, _until];
 }
 
-function calculatePrev(startDate: Moment, endDate: Moment, calcType: String) {
+function calculatePrev(startDate: Moment | null, endDate: Moment | null, calcType: String) {
+  
+  if (!startDate || !endDate){
+    return [null, null]
+  }
+  
   const daysBetween = endDate.diff(startDate, 'days');
 
   let startDatePrev = moment();
@@ -225,11 +227,19 @@ export default function buildQuery(formData: QueryFormData) {
     ({ operator }: { operator: string }) => operator === 'TEMPORAL_RANGE',
   );
 
+  const timeFilterIndex: number = formData.adhoc_filters.findIndex(
+    ({ operator }: { operator: string }) => operator === 'TEMPORAL_RANGE',
+  );
+
   const [testSince, testUntil] = getSinceUntil(
     timeFilter.comparator.toLowerCase(),
   );
 
   console.log(testSince, testUntil);
+
+  let queryBComparator: any;
+  console.log('Print Time', timeComparison)
+  if (timeComparison!='c'){
 
   const [prevStartDateMoment, prevEndDateMoment] = calculatePrev(
     testSince,
@@ -237,9 +247,24 @@ export default function buildQuery(formData: QueryFormData) {
     timeComparison,
   );
 
-  const queryBComparator = `${prevStartDateMoment.format(
+    queryBComparator = `${prevStartDateMoment.format(
     'YYYY-MM-DDTHH:mm:ss',
   )} : ${prevEndDateMoment.format('YYYY-MM-DDTHH:mm:ss')}`;
+
+  } else {
+    const timeBFilter: any = formData.adhoc_custom.find(
+      ({ operator }: { operator: string }) => operator === 'TEMPORAL_RANGE',
+    );
+
+    const timeBFilterIndex: number = formData.adhoc_filters.findIndex(
+      ({ operator }: { operator: string }) => operator === 'TEMPORAL_RANGE',
+    );
+    
+    
+
+    queryBComparator = timeBFilter.comparator;
+    console.log('Custom Range', queryBComparator);
+  }
 
   console.log('Comparator', queryBComparator);
 

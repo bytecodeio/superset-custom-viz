@@ -17,7 +17,10 @@
  * under the License.
  */
 import React, { useEffect, createRef } from 'react';
-import { styled } from '@superset-ui/core';
+import { 
+  styled,
+  computeMaxFontSize,
+  BRAND_COLOR } from '@superset-ui/core';
 import { CustomVizProps, CustomVizStylesProps } from './types';
 
 // The following Styles component is a <div> element, which has been styled using Emotion
@@ -28,54 +31,38 @@ import { CustomVizProps, CustomVizStylesProps } from './types';
 // https://github.com/apache-superset/superset-ui/blob/master/packages/superset-ui-core/src/style/index.ts
 
 const Styles = styled.div<CustomVizStylesProps>`
-  background-color: ${({ theme }) => theme.colors.secondary.light1};
+
+  font-family: ${({ theme }) => theme.typography.families.sansSerif};
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   padding: ${({ theme }) => theme.tdUnit * 4}px;
   border-radius: ${({ theme }) => theme.tdUnit * 2}px;
   height: ${({ height }) => height}px;
   width: ${({ width }) => width}px;
-
-  h3 {
-    /* You can use your props to control CSS! */
-    margin-top: 0;
-    margin-bottom: ${({ theme }) => theme.tdUnit * 3}px;
-    font-size: ${({ theme, headerFontSize }) =>
-      theme.typography.sizes[headerFontSize]}px;
-    font-weight: ${({ theme, boldText }) =>
-      theme.typography.weights[boldText ? 'bold' : 'normal']};
-  }
-
-  table {
-    width: 100%;
-    table-layout: fixed;
-  }
-
-  td {
-    border-style: solid;
-    border-color: ${({ theme }) => theme.colors.secondary.light2};
-    text-align: center;
-  }
-
-  pre {
-    height: ${({ theme, headerFontSize, height }) =>
-      height - theme.tdUnit * 12 - theme.typography.sizes[headerFontSize]}px;
-  }
 `;
 
 const BigValueContainer = styled.div`
-  font-size: 40px;
+  font-size: ${props=> props.headerFontSize ? props.headerFontSize : 60}px;
+  font-weight: ${({ theme }) => theme.typography.weights.normal};
   text-align: center;
-  background-color: ${({ theme }) => theme.colors.secondary.light4};
-  border-top: solid;
-  border-left: solid;
-  border-right: solid;
-  border-color: ${({ theme }) => theme.colors.secondary.light2};
 `;
 
-const ValueContainer = styled.div`
-  background-color: ${({ theme }) => theme.colors.secondary.light4};
-  font-size: 20px;
-  //border-style: solid;
-  //border-color: ${({ theme }) => theme.colors.secondary.light2};
+const TableContainer = styled.div`
+  width: 100%;
+  display: table;
+`
+
+const ComparisonContainer = styled.div`
+  display: table-row;
+`;
+
+const ComparisonValue = styled.div`
+  font-weight: ${({ theme }) => theme.typography.weights.light};
+  width: 33%;
+  display: table-cell;
+  font-size: ${props=> props.subheaderFontSize ? props.subheaderFontSize : 20}px;
   text-align: center;
 `;
 
@@ -86,14 +73,10 @@ const ValueContainer = styled.div`
  *  * A DOM element
  *  * FormData (your controls!) provided as props by transformProps.ts
  */
-const PROPORTION = {
-  // text size: proportion of the chart container sans trendline
-  KICKER: 0.1,
-  HEADER: 0.3,
-  SUBHEADER: 0.125,
-  // trendline size: proportion of the whole chart container
-  TRENDLINE: 0.3,
-};
+
+const getAdjustedFontSize = (props) => {
+  const calculateMaxFontSize( props.text)
+}
 
 
 export default function PopKPI(props: CustomVizProps) {
@@ -109,7 +92,9 @@ export default function PopKPI(props: CustomVizProps) {
     prevNumber,
     valueDifference,
     percentDifference,
-    compType
+    headerFontSize,
+    subheaderFontSize,
+    compType,
   } = props;
 
   const rootElem = createRef<HTMLDivElement>();
@@ -131,30 +116,15 @@ export default function PopKPI(props: CustomVizProps) {
       height={height}
       width={width}
     >
-      <BigValueContainer>{bigNumber}</BigValueContainer>
-      <table>
-        <tr>
-          <td>
-            <ValueContainer>Prev: {prevNumber}</ValueContainer>
-          </td>
-          <td>
-            <ValueContainer>Δ: {valueDifference}</ValueContainer>
-          </td>
-          <td>
-            <ValueContainer>%Δ: {percentDifference}</ValueContainer>
-          </td>
-        </tr>
-      </table>
-      <div>{props.headerText}</div>
-      <h4>{metricName}</h4>
-      <h4>
-        This {compType}: {bigNumber}
-      </h4>
-      <h4>
-        Last {compType}: {prevNumber}
-      </h4>
-      <h4>Value Difference {valueDifference}</h4>
-      <h4>Percent Difference: {percentDifference}</h4>
+
+      <BigValueContainer headerFontSize={headerFontSize}>{bigNumber}</BigValueContainer>
+      <TableContainer>
+        <ComparisonContainer>
+          <ComparisonValue subheaderFontSize={subheaderFontSize}> #: {prevNumber}</ComparisonValue>
+          <ComparisonValue subheaderFontSize={subheaderFontSize}> Δ: {valueDifference}</ComparisonValue>
+          <ComparisonValue subheaderFontSize={subheaderFontSize}> %: {percentDifference}</ComparisonValue>
+        </ComparisonContainer>
+      </TableContainer>
     </Styles>
   );
 }

@@ -27,6 +27,7 @@ export interface CustomVizStylesProps {
   height: number;
   width: number;
   headerFontSize: keyof typeof supersetTheme.typography.sizes;
+  subheaderFontSize: keyof typeof supersetTheme.typography.sizes;
   boldText: boolean;
 }
 
