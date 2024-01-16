@@ -231,11 +231,7 @@ export default function buildQuery(formData: QueryFormData) {
   const [testSince, testUntil] = getSinceUntil(
     timeFilter.comparator.toLowerCase(),
   );
-
-
-  let queryBComparator: any;
-  let queryBFilter : {};
-  let queryBFilters :{};
+  
   let formDataB: {};
 
   if (timeComparison!='c'){
@@ -246,17 +242,17 @@ export default function buildQuery(formData: QueryFormData) {
     timeComparison,
   );
 
-    queryBComparator = `${prevStartDateMoment?.format(
+    const queryBComparator = `${prevStartDateMoment?.format(
     'YYYY-MM-DDTHH:mm:ss',
   )} : ${prevEndDateMoment?.format('YYYY-MM-DDTHH:mm:ss')}`;
 
-    queryBFilter = {
+  const queryBFilter = {
       ...timeFilter,
       comparator: queryBComparator.replace(/Z/g, '')
     }
 
     const otherFilters = formData.adhoc_filters.filter((_value: any, index: number) => timeFilterIndex !== index);
-    queryBFilters = otherFilters ? [queryBFilter, ...otherFilters] : [queryBFilter];
+    const queryBFilters = otherFilters ? [queryBFilter, ...otherFilters] : [queryBFilter];
     
     formDataB= {
       ...formData,
