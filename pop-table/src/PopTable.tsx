@@ -17,10 +17,8 @@
  * under the License.
  */
 import React, { useEffect, createRef } from 'react';
-import { 
-  styled,
-  } from '@superset-ui/core';
-import { CustomVizProps, CustomVizStylesProps } from './types';
+import { styled } from '@superset-ui/core';
+import { PopTableProps, PopTableStylesProps } from './types';
 
 // The following Styles component is a <div> element, which has been styled using Emotion
 // For docs, visit https://emotion.sh/docs/styled
@@ -29,40 +27,27 @@ import { CustomVizProps, CustomVizStylesProps } from './types';
 // imported from @superset-ui/core. For variables available, please visit
 // https://github.com/apache-superset/superset-ui/blob/master/packages/superset-ui-core/src/style/index.ts
 
-const Styles = styled.div<CustomVizStylesProps>`
-
-  font-family: ${({ theme }) => theme.typography.families.sansSerif};
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: ${({ theme }) => theme.tdUnit * 4}px;
-  border-radius: ${({ theme }) => theme.tdUnit * 2}px;
+const Styles = styled.div<PopTableStylesProps>`
+  background-color: ${({ theme }) => theme.colors.secondary.light2};
+  padding: ${({ theme }) => theme.gridUnit * 4}px;
+  border-radius: ${({ theme }) => theme.gridUnit * 2}px;
   height: ${({ height }) => height}px;
   width: ${({ width }) => width}px;
-`;
 
-const BigValueContainer = styled.div`
-  font-size: ${props=> props.headerFontSize ? props.headerFontSize : 60}px;
-  font-weight: ${({ theme }) => theme.typography.weights.normal};
-  text-align: center;
-`;
+  h3 {
+    /* You can use your props to control CSS! */
+    margin-top: 0;
+    margin-bottom: ${({ theme }) => theme.gridUnit * 3}px;
+    font-size: ${({ theme, headerFontSize }) =>
+      theme.typography.sizes[headerFontSize]}px;
+    font-weight: ${({ theme, boldText }) =>
+      theme.typography.weights[boldText ? 'bold' : 'normal']};
+  }
 
-const TableContainer = styled.div`
-  width: 100%;
-  display: table;
-`
-
-const ComparisonContainer = styled.div`
-  display: table-row;
-`;
-
-const ComparisonValue = styled.div`
-  font-weight: ${({ theme }) => theme.typography.weights.light};
-  width: 33%;
-  display: table-cell;
-  font-size: ${props=> props.subheaderFontSize ? props.subheaderFontSize : 20}px;
-  text-align: center;
+  pre {
+    height: ${({ theme, headerFontSize, height }) =>
+      height - theme.gridUnit * 12 - theme.typography.sizes[headerFontSize]}px;
+  }
 `;
 
 /**
@@ -73,25 +58,10 @@ const ComparisonValue = styled.div`
  *  * FormData (your controls!) provided as props by transformProps.ts
  */
 
-
-
-export default function PopKPI(props: CustomVizProps) {
+export default function PopTable(props: PopTableProps) {
   // height and width are the height and width of the DOM element as it exists in the dashboard.
   // There is also a `data` prop, which is, of course, your DATA 🎉
-  const {
-    data,
-    height,
-    width,
-    metrics,
-    metricName,
-    bigNumber,
-    prevNumber,
-    valueDifference,
-    percentDifference,
-    headerFontSize,
-    subheaderFontSize,
-    compType,
-  } = props;
+  const { data, height, width } = props;
 
   const rootElem = createRef<HTMLDivElement>();
 
@@ -99,10 +69,10 @@ export default function PopKPI(props: CustomVizProps) {
   // Here, you can do that with createRef, and the useEffect hook.
   useEffect(() => {
     const root = rootElem.current as HTMLElement;
+    console.log('Plugin element', root);
   });
 
-  // We grab the ones that are index as one.
-  // All other metrics are ignored
+  console.log('Plugin props', props);
 
   return (
     <Styles
@@ -112,15 +82,8 @@ export default function PopKPI(props: CustomVizProps) {
       height={height}
       width={width}
     >
-
-      <BigValueContainer headerFontSize={headerFontSize}>{bigNumber}</BigValueContainer>
-      <TableContainer>
-        <ComparisonContainer>
-          <ComparisonValue subheaderFontSize={subheaderFontSize}> #: {prevNumber}</ComparisonValue>
-          <ComparisonValue subheaderFontSize={subheaderFontSize}> Δ: {valueDifference}</ComparisonValue>
-          <ComparisonValue subheaderFontSize={subheaderFontSize}> %: {percentDifference}</ComparisonValue>
-        </ComparisonContainer>
-      </TableContainer>
+      <h3>{props.headerText}</h3>
+      <pre>${JSON.stringify(data, null, 2)}</pre>
     </Styles>
   );
 }
